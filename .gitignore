@@ -1,0 +1,2 @@
+# Avoid any trash files I created because vim
+*.swp
