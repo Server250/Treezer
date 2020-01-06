@@ -1,35 +1,47 @@
 import re
 
+#TODO: DEAL WITH EOLs IT'S PROBABLY VERY EASY
+
 class Element:
 
-	def __init__(self,name,children):
+	def __init__(self,name,children,properties):
 		self.name=name
-		self.children=[]
+		self.children=children
 		self.properties=[]
-		self.content=""
 		#print("Element created: " + self.name)
-		
+
+	def log(self,indent=0):
+		print(("\t"*indent) + "Element type: " + self.name)
+		for e in self.children:
+			if (type(e) is str):
+				print (("\t"*(indent+1)) + "Element contents: " + e)
+			else:
+				e.log(indent+1)		
+
 def parseTags(content):
 
-	if ((not content) or (content == "")):
-		return
-
-	# TODO: Self-closing tags
-
 	# Matches: open tag, a word, spaces, as many attributes (making sure quotes match)	
-	openTagRe = re.compile(r'<(\w+)(\s(\w+(=(?P<quote>\"|\').*(?P=quote)?))?)*>', re.IGNORECASE)
-	openTag = re.search(openTagRe,content)	
+	tagRe = re.compile(r'<(?P<tname>\w+)(\s(\w+(=(?P<quote>\"|\').*(?P=quote)?))?)*((\/>)|(>(.*)(<\/(?P=tname)>)))', re.IGNORECASE)
+	tag = re.search(tagRe,content)
 	
-	# find closing tag for new tag
-	closeTagRe = re.compile(r'<\/('+openTag.group(1)+')>', re.IGNORECASE)
-	closeTag = re.search(closeTagRe,content)	
-	#print("Open tag: " + openTag.group(0))
-	#print("Close tag: " + closeTag.group(0))		
+	# if contents aren't a tag, return the text
+	if (tag==None):
+		return content
 
-	internalContent = content[openTag.span()[1]:closeTag.span()[0]]	
-	return Element(openTag.group(1),parseTags(internalContent))
+	# extract properties
+	properties=[]
+	
+	children=[]
+	# if tag.group(9) exists, there is child data
+	if (tag.group(9)):
+		#print("HAS CONTENTS")
+		for e in re.findall(tagRe,tag.group(9)):
+			#print("HAS CONTENTS")
+			# PARSE ALL OF THEse hot mamas
+		
+	return Element(tag.group(1),children,properties)
 
 if __name__=="__main__":
 	print("Treezer running.")
-	print("Root tag: " + parseTags("<html><body><img><a></a></img><img></img></body></html>").name)
+	parseTags("<html><a><span>abcdefg</span></a><b/></html>").log()
 	print("Treezer completed.")
