@@ -21,7 +21,7 @@ class Element:
 def parseTags(content):
 
 	# Matches: open tag, a word, spaces, as many attributes (making sure quotes match)	
-	tagRe = re.compile(r'<(?P<tname>\w+)(\s(\w+(=(?P<quote>\"|\').*(?P=quote)?))?)*((\/>)|(>(.*)(<\/(?P=tname)>)))', re.IGNORECASE)
+	tagRe = re.compile(r'(<(?P<tname>\w+))(\s(\w+(=(?P<quote>\"|\').*(?P=quote)?))?)*((\/>)|(>(.*)(<\/(?P=tname)>)))', re.IGNORECASE)
 	tag = re.search(tagRe,content)
 	
 	# if contents aren't a tag, return the text
@@ -34,12 +34,13 @@ def parseTags(content):
 	children=[]
 	# if tag.group(9) exists, there is child data
 	if (tag.group(9)):
-		#print("HAS CONTENTS")
-		for e in re.findall(tagRe,tag.group(9)):
-			#print("HAS CONTENTS")
-			# PARSE ALL OF THEse hot mamas
-		
-	return Element(tag.group(1),children,properties)
+		contentData = tag.group(9)
+		while (contentData.rstrip()): # While there is data left to process in the contents
+			# search for the first match (re.search)
+			# parseTags this as a child
+			# substring contentData to start at the end of the parsed data
+
+	return Element(tag.group(2),children,properties)
 
 if __name__=="__main__":
 	print("Treezer running.")
