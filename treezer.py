@@ -4,10 +4,11 @@ import re
 
 class Element:
 
-	def __init__(self,name,children,properties):
+	def __init__(self,name,children,properties,blksize):
 		self.name=name
 		self.children=children
 		self.properties=[]
+		self.blockSize=blksize # block size used for parsing
 		#print("Element created: " + self.name)
 
 	def log(self,indent=0):
@@ -32,17 +33,25 @@ def parseTags(content):
 	properties=[]
 	
 	children=[]
-	# if tag.group(9) exists, there is child data
-	if (tag.group(9)):
-		contentData = tag.group(9)
-		while (contentData.rstrip()): # While there is data left to process in the contents
-			# search for the first match (re.search)
-			# parseTags this as a child
-			# substring contentData to start at the end of the parsed data
 
-	return Element(tag.group(2),children,properties)
+	# TODO: CHECK IF MATCH LENGTH IS EXACTLY THAT OF THE DATA, ELSE EVERYTHING BEFORE AND AFTER MUST BE CHECKED
+	# if tag.group(10) exists, there is child data
+	if (tag.group(10)):
+		contentData = tag.group(10)
+		while (contentData): # While there is data left to process in the contents
+			nextTag=parseTags(contentData)
+			children.append(nextTag)
+			if ((type(nextTag)==str) and (len(nextTag)<len(contentData))):
+				contentData=""
+				print("More to do!")
+			else:
+				contentData=""
+				print("OUT")
+
+	return Element(tag.group(2),children,properties,len(content))
 
 if __name__=="__main__":
 	print("Treezer running.")
 	parseTags("<html><a><span>abcdefg</span></a><b/></html>").log()
+
 	print("Treezer completed.")
