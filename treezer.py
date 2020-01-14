@@ -4,11 +4,11 @@ import re
 
 class Element:
 
-	def __init__(self,name,children,properties,blksize):
+	def __init__(self,name,children,properties,pdata):
 		self.name=name
 		self.children=children
 		self.properties=[]
-		self.blockSize=blksize # block size used for parsing
+		self.parseData={"blockSize":pdata[0],"blockPos":pdata[1]} # pdata is data gathered by and used in the parsing process
 		#print("Element created: " + self.name)
 
 	def log(self,indent=0):
@@ -41,14 +41,10 @@ def parseTags(content):
 		while (contentData): # While there is data left to process in the contents
 			nextTag=parseTags(contentData)
 			children.append(nextTag)
-			if ((type(nextTag)==str) and (len(nextTag)<len(contentData))):
-				contentData=""
-				print("More to do!")
-			else:
-				contentData=""
-				print("OUT")
+			
+			contentData = "" # prevent infinite looping
 
-	return Element(tag.group(2),children,properties,len(content))
+	return Element(tag.group(2),children,properties,(len(content),0))
 
 if __name__=="__main__":
 	print("Treezer running.")
