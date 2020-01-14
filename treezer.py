@@ -39,15 +39,17 @@ def parseTags(content):
 	if (tag.group(10)):
 		contentData = tag.group(10)
 		while (contentData): # While there is data left to process in the contents
+			#print("Content data: " + contentData)
 			nextTag=parseTags(contentData)
 			children.append(nextTag)
 			
 			contentData = "" # prevent infinite looping
+		#print("NO MORE CONTENT DATA")
 
-	return Element(tag.group(2),children,properties,(len(content),0))
+	return Element(tag.group(2),children,properties,(len(content),tag.span()[0]))
 
 if __name__=="__main__":
 	print("Treezer running.")
-	parseTags("<html><a><span>abcdefg</span></a><b/></html>").log()
+	parseTags("<html><a><span><p></p><q></q></span></a><b/></html>").log()
 
 	print("Treezer completed.")
