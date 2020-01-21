@@ -43,13 +43,28 @@ def parseTags(content):
 			nextTag=parseTags(contentData)
 			children.append(nextTag)
 			
-			contentData = "" # prevent infinite looping
+			# If tag didn't start at start of contents, there is text there which won't be caught by the regex
+			tagStartPos = nextTag.parseData["blockPos"][0]
+			if (tagStartPos > 0):
+				children.insert(0,contentData[:tagStartPos])				
+			
+			# If the tag didn't end at the end of the contents, everything left over must be parsed
+			tagEndPos = nextTag.parseData["blockPos"][1]
+			if (tagEndPos < len(contentData)):
+				contentData = contentData[tagEndPos:]
+			else:
+				contentData = ""
+
 		#print("NO MORE CONTENT DATA")
 
-	return Element(tag.group(2),children,properties,(len(content),tag.span()[0]))
+	return Element(tag.group(2),children,properties,(len(content),tag.span()))
 
 if __name__=="__main__":
 	print("Treezer running.")
-	parseTags("<html><a><span><p></p><q></q></span></a><b/></html>").log()
+
+	testData="<html><a><span>abcdef<p></p><q></q></span></a><b/></html>"
+	
+	print("Test data: " + testData)
+	parseTags(testData).log()
 
 	print("Treezer completed.")
