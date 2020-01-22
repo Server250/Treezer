@@ -34,7 +34,6 @@ def parseTags(content):
 	
 	children=[]
 
-	# TODO: CHECK IF MATCH LENGTH IS EXACTLY THAT OF THE DATA, ELSE EVERYTHING BEFORE AND AFTER MUST BE CHECKED
 	# if tag.group(10) exists, there is child data
 	if (tag.group(10)):
 		contentData = tag.group(10)
@@ -46,7 +45,7 @@ def parseTags(content):
 			# If tag didn't start at start of contents, there is text there which won't be caught by the regex
 			tagStartPos = nextTag.parseData["blockPos"][0]
 			if (tagStartPos > 0):
-				children.insert(0,contentData[:tagStartPos])				
+				children.insert(len(children)-1,contentData[:tagStartPos])				
 			
 			# If the tag didn't end at the end of the contents, everything left over must be parsed
 			tagEndPos = nextTag.parseData["blockPos"][1]
@@ -62,7 +61,7 @@ def parseTags(content):
 if __name__=="__main__":
 	print("Treezer running.")
 
-	testData="<html><a><span>abcdef<p></p><q></q></span></a><b/></html>"
+	testData="<html><a><span>abcdef<p></p>teflon<q></q></span></a><b/></html>"
 	
 	print("Test data: " + testData)
 	parseTags(testData).log()
