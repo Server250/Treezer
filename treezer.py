@@ -1,6 +1,7 @@
 import re
 
 #TODO: DEAL WITH EOLs IT'S PROBABLY VERY EASY
+#TODO: DEAL WITH PROPERTIES
 
 class Element:
 
@@ -53,8 +54,6 @@ def parseTags(content):
 				contentData = contentData[tagEndPos:]
 			else:
 				contentData = ""
-
-		#print("NO MORE CONTENT DATA")
 
 	return Element(tag.group(2),children,properties,(len(content),tag.span()))
 
