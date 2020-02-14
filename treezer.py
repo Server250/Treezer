@@ -1,16 +1,15 @@
 import re
 
 #TODO: DEAL WITH EOLs IT'S PROBABLY VERY EASY
-#TODO: DEAL WITH PROPERTIES
 
 class Element:
 
 	def __init__(self,name,children,properties,pdata):
 		self.name=name
 		self.children=children
-		self.properties=[]
+		self.properties=properties
 		self.parseData={"blockSize":pdata[0],"blockPos":pdata[1]} # pdata is data gathered by and used in the parsing process
-		#print("Element created: " + self.name)
+		#print("Element created: " + self.name + "\nProperties: " + str(properties))
 
 	def log(self,indent=0):
 		print(("\t"*indent) + "Element type: " + self.name)
@@ -23,7 +22,7 @@ class Element:
 def parseTags(content):
 
 	# Matches: open tag, a word, spaces, as many attributes (making sure quotes match)	
-	tagRe = re.compile(r'(<(?P<tname>\w+))(\s(\w+(=(?P<quote>\"|\').*(?P=quote)?))?)*((\/>)|(>(.*)(<\/(?P=tname)>)))', re.IGNORECASE)
+	tagRe = re.compile(r'(<(?P<tname>\w+))(\s(\w+(=(?P<quote>\"|\')(.*?)(?P=quote)?))?)*((\/>)|(>(.*)(<\/(?P=tname)>)))', re.IGNORECASE)
 	tag = re.search(tagRe,content)
 	
 	# if contents aren't a tag, return the text
@@ -31,13 +30,16 @@ def parseTags(content):
 		return content
 
 	# extract properties
-	properties=[]
+	properties={}
+	# If there are any properties to retrieve
+	if (tag.group(4)):
+		properties[tag.group(4).split("=")[0].strip()]=tag.group(7) # Get data up to first equals sign and remove its excess spacing
 	
 	children=[]
 
-	# if tag.group(10) exists, there is child data
-	if (tag.group(10)):
-		contentData = tag.group(10)
+	# if tag.group(11) exists, there is child data (not a self closing tag)
+	if (tag.group(11)):
+		contentData = tag.group(11)
 		while (contentData): # While there is data left to process in the contents
 			#print("Content data: " + contentData)
 			nextTag=parseTags(contentData)
@@ -60,7 +62,7 @@ def parseTags(content):
 if __name__=="__main__":
 	print("Treezer running.")
 
-	testData="<html><a><span>abcdef<p></p>teflon<q></q></span></a><b/></html>"
+	testData="<html><a><span style=\"abcede\">abcdef<p></p>teflon<q></q></span></a><b/></html>"
 	
 	print("Test data: " + testData)
 	parseTags(testData).log()
